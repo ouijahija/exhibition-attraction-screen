@@ -29,18 +29,21 @@ namespace Zhdk.Gamelab
         private float idleTime;
         private bool attractionScreenIsOn;
         private Coroutine attractionScreenRoutine;
+        private bool anyInput;
 
         /// <summary>
         /// If you use any other input tool you  might change this function with the input detection methods of your tool / game. 
         /// </summary>
         /// <returns>If there is any input taken that will influence the attraction screen</returns>
-        private bool GetAnyInput()
-        {
-            return Input.anyKey || Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0;
-        }
+        //private bool GetAnyInput()
+        //{
+        //    return Input.anyKey || Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0;
+        //}
 
         private void Awake()
         {
+            InputManager.Instance.AnyInput += AnyInputPerformed;
+
             if (instance != null && instance != this)
             {
                 Destroy(gameObject);
@@ -61,6 +64,11 @@ namespace Zhdk.Gamelab
             }
         }
 
+        private void AnyInputPerformed()
+        {
+            anyInput = true;
+        }
+
         private void Update()
         {
             if (attractionScreenIsOn)
@@ -68,7 +76,7 @@ namespace Zhdk.Gamelab
                 return;
             }
 
-            bool anyInput = GetAnyInput();
+            //anyInput = GetAnyInput();
             
             if(anyInput == false && idleTime > idleTimeLimit)
             {
@@ -91,6 +99,8 @@ namespace Zhdk.Gamelab
                     idleTime += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
                 }
             }
+
+            anyInput = false;
         }
 
         private IEnumerator StartAttractionScreen()
@@ -122,7 +132,7 @@ namespace Zhdk.Gamelab
                 canvas.enabled = true;
             }
 
-            while (GetAnyInput() == false)
+            while (anyInput == false)
             {
                 yield return null;
             }
